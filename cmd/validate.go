@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/OliverCardoza/traindown-go"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/traindown/traindown-go"
 )
 
 const (
