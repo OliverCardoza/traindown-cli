@@ -3,9 +3,9 @@ module github.com/OliverCardoza/traindown-cli
 go 1.17
 
 require (
-	github.com/OliverCardoza/traindown-go v1.1.1
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v1.3.0
+	github.com/traindown/traindown-go v1.1.1-0.20211226150333-1a4f0b99a169
 )
 
 require (
