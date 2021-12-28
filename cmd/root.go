@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/OliverCardoza/traindown-cli/cmd/internal"
@@ -39,8 +38,6 @@ func readInput() ([]*traindown.Session, error) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Reading input: %s\n", input)
-
 	extension, err := rootCmd.Flags().GetString("extension")
 	if err != nil {
 		panic(err)
