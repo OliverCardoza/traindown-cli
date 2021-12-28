@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"sort"
 
+	"github.com/OliverCardoza/traindown-cli/cmd/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -34,18 +34,6 @@ func init() {
 	rootCmd.AddCommand(movementsCmd)
 }
 
-func insertSortedSet(sortedSet []string, newString string) []string {
-	index := sort.SearchStrings(sortedSet, newString)
-	if index < len(sortedSet) && sortedSet[index] == newString {
-		// Don't need to insert if the value is already present in the set.
-		return sortedSet
-	}
-	sortedSet = append(sortedSet, "")
-	copy(sortedSet[index+1:], sortedSet[index:])
-	sortedSet[index] = newString
-	return sortedSet
-}
-
 func movements(cmd *cobra.Command, args []string) {
 	pattern := ""
 	if len(args) == 1 {
@@ -57,7 +45,7 @@ func movements(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	var sortedNames []string
+	var sortedNames internal.StringSet
 	for _, session := range sessions {
 		for _, movement := range session.Movements {
 			if pattern != "" {
@@ -70,7 +58,7 @@ func movements(cmd *cobra.Command, args []string) {
 					continue
 				}
 			}
-			sortedNames = insertSortedSet(sortedNames, movement.Name)
+			sortedNames = sortedNames.Insert(movement.Name)
 		}
 	}
 	for _, name := range sortedNames {
