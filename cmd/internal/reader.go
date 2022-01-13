@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -13,6 +14,39 @@ import (
 // TraindownReader reads a file or directory and returns Traindown data.
 type TraindownReader struct {
 	suffix string
+}
+
+func validate(session *traindown.Session) error {
+	if len(session.Errors) != 0 {
+		errMsg := "error writing guidance to storage:"
+		for _, err := range session.Errors {
+			errMsg = errMsg + fmt.Sprintf("\n\t%v", err)
+		}
+		return fmt.Errorf(errMsg)
+	}
+	if session.Date.IsZero() {
+		return fmt.Errorf("session missing date")
+	}
+	if len(session.Movements) == 0 {
+		return fmt.Errorf("session missing movements")
+	}
+	for _, movement := range session.Movements {
+		if movement.Name == "" {
+			return fmt.Errorf("movement missing name")
+		}
+		if len(movement.Performances) == 0 {
+			return fmt.Errorf("movement %s missing performances", movement.Name)
+		}
+		for _, performance := range movement.Performances {
+			if performance.Reps == 0 {
+				return fmt.Errorf("performaance missing reps")
+			}
+			if performance.Sets == 0 {
+				return fmt.Errorf("performance missing sets")
+			}
+		}
+	}
+	return nil
 }
 
 // Read reads the traindown files referenced in the input file path.
@@ -32,6 +66,10 @@ func (t *TraindownReader) Read(input string) ([]*traindown.Session, error) {
 			session, err := traindown.ParseByte(data)
 			if err != nil {
 				return errors.Wrapf(err, "error parsing file: %s", path)
+			}
+			err = validate(session)
+			if err != nil {
+				return errors.Wrapf(err, "validation error in file: %s", path)
 			}
 			sessions = append(sessions, session)
 			return nil
