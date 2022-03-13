@@ -25,6 +25,19 @@ validating file content to ensure it follows the
 traindown-cli validate -i $FILE_OR_DIR
 ```
 
+For convenience you can set the `TRAINDOWN_INPUT` env var instead of always
+providing the input flag.
+
+```bash
+export TRAINDOWN_INPUT=~/traindown
+
+# Show a list of all movements
+traindown-cli movements
+
+# Show your squat PR
+traindown-cli prs Squat
+```
+
 ## Development
 
 To run the local code during development:

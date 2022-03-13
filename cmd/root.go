@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/OliverCardoza/traindown-cli/cmd/internal"
@@ -8,11 +9,19 @@ import (
 	"github.com/traindown/traindown-go"
 )
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "traindown-cli",
-	Short: `traindown-cli is a command line tool for fitness data using the Traindrain spec.`,
-}
+const (
+	inputFlagName = "input"
+	inputEnvVar   = "TRAINDOWN_INPUT"
+)
+
+var (
+	// rootCmd represents the base command when called without any subcommands
+	rootCmd = &cobra.Command{
+		Use:   "traindown-cli",
+		Short: `traindown-cli is a command line tool for fitness data using the Traindrain spec.`,
+	}
+	inputFlag = internal.NewEnvFallbackFlag(inputFlagName, inputEnvVar)
+)
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -27,21 +36,30 @@ func init() {
 	// Disable the `completion` command which can be used to support shell autocomplete.
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
-	rootCmd.PersistentFlags().StringP("input", "i", "", "Input file or directory")
-	rootCmd.MarkPersistentFlagRequired("input")
-
+	inputUsage := fmt.Sprintf("Input file or directory. May also be set using the %s env var.", inputEnvVar)
+	rootCmd.PersistentFlags().VarP(inputFlag, inputFlagName, "i", inputUsage)
 	rootCmd.PersistentFlags().String("extension", ".traindown", "The file extension used to identify traindown files. Other files are ignored.")
 }
 
-func readInput() ([]*traindown.Session, error) {
-	input, err := rootCmd.Flags().GetString("input")
+func readInput() []*traindown.Session {
+	input, err := inputFlag.Get()
 	if err != nil {
-		panic(err)
+		exit(err)
 	}
+
 	extension, err := rootCmd.Flags().GetString("extension")
 	if err != nil {
-		panic(err)
+		exit(err)
 	}
 	reader := internal.NewTraindownReader(extension)
-	return reader.Read(input)
+	sessions, err := reader.Read(input)
+	if err != nil {
+		exit(err)
+	}
+	return sessions
+}
+
+func exit(err error) {
+	fmt.Printf("%v\n", err)
+	os.Exit(1)
 }

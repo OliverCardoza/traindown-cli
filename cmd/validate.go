@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -31,10 +30,6 @@ func init() {
 }
 
 func validate(cmd *cobra.Command, args []string) {
-	sessions, err := readInput()
-	if err != nil {
-		fmt.Printf("%v", err)
-		os.Exit(1)
-	}
+	sessions := readInput()
 	fmt.Printf("Validation successful: processed %d sessions\n", len(sessions))
 }

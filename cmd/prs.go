@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"regexp"
 	"time"
@@ -72,12 +71,7 @@ func prs(cmd *cobra.Command, args []string) {
 	if len(args) == 1 {
 		pattern = args[0]
 	}
-	sessions, err := readInput()
-	if err != nil {
-		fmt.Printf("%v", err)
-		os.Exit(1)
-	}
-
+	sessions := readInput()
 	records := make(map[string]*personalRecord)
 	var sortedNames internal.StringSet
 	for _, session := range sessions {
@@ -85,8 +79,7 @@ func prs(cmd *cobra.Command, args []string) {
 			if pattern != "" {
 				matched, err := regexp.MatchString(pattern, movement.Name)
 				if err != nil {
-					fmt.Printf("%v", err)
-					os.Exit(1)
+					exit(err)
 				}
 				if !matched {
 					continue

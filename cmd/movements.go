@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 
 	"github.com/OliverCardoza/traindown-cli/cmd/internal"
@@ -39,20 +38,14 @@ func movements(cmd *cobra.Command, args []string) {
 	if len(args) == 1 {
 		pattern = args[0]
 	}
-	sessions, err := readInput()
-	if err != nil {
-		fmt.Printf("%v", err)
-		os.Exit(1)
-	}
-
+	sessions := readInput()
 	var sortedNames internal.StringSet
 	for _, session := range sessions {
 		for _, movement := range session.Movements {
 			if pattern != "" {
 				matched, err := regexp.MatchString(pattern, movement.Name)
 				if err != nil {
-					fmt.Printf("%v", err)
-					os.Exit(1)
+					exit(err)
 				}
 				if !matched {
 					continue
