@@ -28,7 +28,7 @@ func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
 	rootCmd.PersistentFlags().StringP("input", "i", "", "Input file or directory")
-	rootCmd.MarkFlagRequired("input")
+	rootCmd.MarkPersistentFlagRequired("input")
 
 	rootCmd.PersistentFlags().String("extension", ".traindown", "The file extension used to identify traindown files. Other files are ignored.")
 }
